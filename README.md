@@ -353,7 +353,6 @@ ThemeManager:ApplyToGroupbox(LeftGroupBox)
 ```lua
 SaveManager:SetLibrary(Library)
 SaveManager:SetFolder('MyHub')
-SaveManager:SetIgnoreList({ 'ThemeManager_ThemeList' })
 
 -- Attach to a tab
 SaveManager:BuildConfigSection(Tab)
@@ -479,7 +478,6 @@ ThemeManager:ApplyToGroupbox(ThemeGroupBox)
 
 SaveManager:SetLibrary(Library)
 SaveManager:SetFolder('MyHub')
-SaveManager:SetIgnoreList({ 'ThemeManager_ThemeList' })
 SaveManager:BuildConfigSection(SaveGroupBox)
 SaveManager:LoadAutoloadConfig()
 ```

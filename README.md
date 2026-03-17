@@ -26,8 +26,8 @@ local Window = Library:CreateWindow({
     AutoShow = true,     -- shows the window immediately on creation
     TabPadding = 8,
     MenuFadeTime = 0.2,
+    Size = Vector2.new(600, 400),
     -- Position = UDim2  (optional)
-    -- Size = Vector2    (optional)
 })
 ```
 

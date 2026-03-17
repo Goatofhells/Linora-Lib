@@ -26,8 +26,7 @@ local Window = Library:CreateWindow({
     AutoShow = true,     -- shows the window immediately on creation
     TabPadding = 8,
     MenuFadeTime = 0.2,
-    Size = Vector2.new(600, 400),
-    -- Position = UDim2  (optional)
+    Size = Vector2.new(600, 400), -- minimum size of the window
 })
 ```
 
@@ -360,5 +359,127 @@ SaveManager:SetIgnoreList({ 'ThemeManager_ThemeList' })
 SaveManager:BuildConfigSection(Tab)
 
 -- Load default config on startup
+SaveManager:LoadAutoloadConfig()
+```
+
+---
+
+## Full Example Script
+```lua
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/G/refs/heads/main/Gui_Lib_fixed.txt'))()
+local ThemeManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/Linoria-Library-Mobile/refs/heads/main/Gui%20Lib%20%5BThemeManager%5D'))()
+local SaveManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/Mc4121ban/Linoria-Library-Mobile/refs/heads/main/Gui%20Lib%20%5BSaveManager%5D'))()
+
+local Window = Library:CreateWindow({
+    Title = 'My Hub',
+    Center = true,
+    AutoShow = true,
+    TabPadding = 8,
+    MenuFadeTime = 0.2,
+    Size = Vector2.new(500, 300),
+})
+
+local Tabs = {
+    Main = Window:AddTab('Main'),
+    Settings = Window:AddTab('Settings'),
+}
+
+local LeftGroupBox  = Tabs.Main:AddLeftGroupbox('Main')
+local RightGroupBox = Tabs.Main:AddRightGroupbox('Misc')
+
+-- Toggle
+LeftGroupBox:AddToggle('MyToggle', {
+    Text = 'Enable Feature',
+    Default = false,
+    Callback = function(Value)
+        print('Toggle:', Value)
+    end
+})
+
+-- Slider
+LeftGroupBox:AddSlider('MySlider', {
+    Text = 'Speed',
+    Default = 16,
+    Min = 0,
+    Max = 100,
+    Rounding = 0,
+    Suffix = ' studs/s',
+    Callback = function(Value)
+        print('Slider:', Value)
+    end
+})
+
+-- Dropdown
+LeftGroupBox:AddDropdown('MyDropdown', {
+    Text = 'Mode',
+    Values = { 'Silent Aim', 'Aimbot', 'Off' },
+    Default = 3,
+    Callback = function(Value)
+        print('Dropdown:', Value)
+    end
+})
+
+-- Button
+LeftGroupBox:AddButton({
+    Text = 'Do Something',
+    Func = function()
+        print('Button clicked!')
+    end,
+    DoubleClick = false,
+})
+
+-- Color Picker
+RightGroupBox:AddLabel('Chams Color'):AddColorPicker('ChamColor', {
+    Default = Color3.fromRGB(255, 100, 100),
+    Callback = function(Value)
+        print('Color:', Value)
+    end
+})
+
+-- Keybind
+RightGroupBox:AddLabel('Toggle Key'):AddKeyPicker('MyKeybind', {
+    Default = 'MB2',
+    Text = 'Activate',
+    Mode = 'Hold',
+    Callback = function(Value)
+        print('Keybind fired:', Value)
+    end
+})
+
+-- Input
+RightGroupBox:AddInput('MyInput', {
+    Text = 'Player Name',
+    Placeholder = 'Enter name...',
+    Finished = true,
+    Callback = function(Value)
+        print('Input:', Value)
+    end
+})
+
+-- Dependency Box (only visible when MyToggle is on)
+local DepBox = LeftGroupBox:AddDependencyBox()
+DepBox:AddSlider('DepSlider', {
+    Text = 'Extra Setting',
+    Default = 5,
+    Min = 0,
+    Max = 10,
+    Rounding = 0,
+})
+DepBox:SetupDependencies({
+    { Toggles.MyToggle, true },
+})
+
+-- Settings tab
+local ThemeGroupBox = Tabs.Settings:AddLeftGroupbox('Themes')
+local SaveGroupBox  = Tabs.Settings:AddRightGroupbox('Configs')
+
+ThemeManager:SetLibrary(Library)
+ThemeManager:SetFolder('MyHub')
+ThemeManager:ApplyToGroupbox(ThemeGroupBox)
+
+SaveManager:SetLibrary(Library)
+SaveManager:SetFolder('MyHub')
+SaveManager:SetIgnoreList({ 'ThemeManager_ThemeList' })
+SaveManager:BuildConfigSection(SaveGroupBox)
 SaveManager:LoadAutoloadConfig()
 ```

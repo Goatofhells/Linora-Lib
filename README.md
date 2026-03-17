@@ -1,370 +1,395 @@
-# Linora-Lib
-The roblox lib, Linora with documentation! 
-## Please star it if you enjoy all the documentation i make for random ui libs
-> [!TIP]
-> I recommend using my [gitbook](https://stratxgy.gitbook.io/linora-lib), as in my opinion it's better than this.
+# Linoria-Lib
+The Roblox UI library Linoria, with full documentation.
 
-> [!IMPORTANT]  
-> This is not mine. Find the real github [here](https://github.com/violin-suzutsuki/LinoriaLib)
+> [!TIP]
+> I recommend using my [gitbook](https://stratxgy.gitbook.io/linora-lib) as it may be easier to read.
+
+> [!IMPORTANT]
+> This library is not mine. Find the original github [here](https://github.com/violin-suzutsuki/LinoriaLib)
 
 ---
 
-## Importing the library
+## Importing
+
+Load the library, ThemeManager and SaveManager at the top of your script.
+
 ```lua
 local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/G/refs/heads/main/Gui_Lib_fixed.txt'))()
 local ThemeManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/Linoria-Library-Mobile/refs/heads/main/Gui%20Lib%20%5BThemeManager%5D'))()
-local SaveManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/addons/SaveManager.lua'))()
+local SaveManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/Mc4121ban/Linoria-Library-Mobile/refs/heads/main/Gui%20Lib%20%5BSaveManager%5D'))()
 ```
 
 ---
 
-## Creating a window
+## Window
+
+Creates the main window. `Title` is the text shown at the top. `Center` places the window in the middle of the screen. `AutoShow` makes it visible immediately on creation. `TabPadding` controls the spacing between tab buttons. `MenuFadeTime` is how long the open/close fade animation takes in seconds. `Size` is required and sets the window dimensions.
+
 ```lua
 local Window = Library:CreateWindow({
-    Title = 'Example menu',
-    Center = true,       -- centers the window on screen
-    AutoShow = true,     -- shows the window immediately on creation
+    Title = 'My Hub',
+    Center = true,
+    AutoShow = true,
     TabPadding = 8,
     MenuFadeTime = 0.2,
-    Size = Vector2.new(600, 400), -- minimum size of the window
+    Size = Vector2.new(500, 300),
 })
 ```
 
 ---
 
-## Creating tabs
+## Tabs
+
+Tabs are the top-level pages inside your window. Each tab holds groupboxes on the left and right side.
+
 ```lua
-local Tab = Window:AddTab('Main')
+local Tabs = {
+    Main = Window:AddTab('Main'),
+    ['UI Settings'] = Window:AddTab('UI Settings'),
+}
 ```
 
 ---
 
-## Creating groupboxes
-Groupboxes are containers that sit inside a tab. Each tab has a left and right column.
-```lua
-local LeftGroupBox  = Tab:AddLeftGroupbox('My Group')
-local RightGroupBox = Tab:AddRightGroupbox('My Group')
+## Groupboxes
 
--- Or with full options:
-local GroupBox = Tab:AddGroupbox({
-    Name = 'My Group',
-    Side = 1,  -- 1 = left, 2 = right
+Groupboxes are containers that sit inside a tab. Use `AddLeftGroupbox` or `AddRightGroupbox` to place them on either side. The string you pass in is the title shown at the top of the box.
+
+```lua
+local LeftGroupBox  = Tabs.Main:AddLeftGroupbox('Features')
+local RightGroupBox = Tabs.Main:AddRightGroupbox('Misc')
+```
+
+---
+
+## Tabboxes
+
+Tabboxes work like groupboxes but have their own inner tabs, useful for organising many elements in a small space. Everything that can be added to a groupbox can also be added to a tabbox tab.
+
+```lua
+local LeftTabBox  = Tabs.Main:AddLeftTabbox()
+local RightTabBox = Tabs.Main:AddRightTabbox()
+
+local Tab1 = LeftTabBox:AddTab('Tab 1')
+local Tab2 = LeftTabBox:AddTab('Tab 2')
+```
+
+---
+
+## Elements
+
+### Toggle
+
+Adds an on/off toggle. `Text` is the label shown next to it. `Default` is the starting state. `Tooltip` shows a small popup on hover. Setting `Risky` to true colours the label red to warn users it's a dangerous option. Access the current state at any time with `Toggles.MyToggle.Value`. Using `OnChanged` is the recommended way to react to changes rather than `Callback`.
+
+```lua
+LeftGroupBox:AddToggle('MyToggle', {
+    Text = 'Enable Feature',
+    Default = false,
+    Tooltip = 'Turns the feature on or off',
+    Risky = false,
 })
-```
 
----
-
-## Creating tabboxes
-Tabboxes are groupboxes with their own inner tabs.
-```lua
-local LeftTabBox  = Tab:AddLeftTabbox('My Tabbox')
-local RightTabBox = Tab:AddRightTabbox('My Tabbox')
-
-local InnerTab = LeftTabBox:AddTab('Inner Tab')
--- InnerTab supports all the same elements as a groupbox
-```
-
----
-
-# Elements
-
-## Toggle
-```lua
-local MyToggle = LeftGroupBox:AddToggle('MyToggle', {
-    Text = 'This is a toggle',
-    Default = false,          -- default value (true / false)
-    Tooltip = 'A tooltip',    -- shown on hover
-    Risky = false,            -- marks label in red (for dangerous options)
-
-    Callback = function(Value)
-        print('[cb] MyToggle changed to:', Value)
-    end
-})
-
--- Methods
-MyToggle:SetValue(true)
-MyToggle:OnChanged(function(Value)
-    print('Toggle changed:', Value)
+Toggles.MyToggle:OnChanged(function()
+    print(Toggles.MyToggle.Value)
 end)
 
--- Reading value
-print(Toggles.MyToggle.Value)
+Toggles.MyToggle:SetValue(true)
 ```
 
 ---
 
-## Button
+### Button
+
+Adds a clickable button. `Text` is the label. `Func` is the function that fires on click. Setting `DoubleClick` to true requires two clicks to trigger it. You can chain `AddButton` on an existing button to add a sub-button directly beneath it.
+
 ```lua
 local MyButton = LeftGroupBox:AddButton({
-    Text = 'Button',
+    Text = 'Do Something',
     Func = function()
-        print('Button clicked!')
+        print('clicked!')
     end,
-    DoubleClick = false,   -- require double click to fire
-    Tooltip = 'A tooltip',
+    DoubleClick = false,
+    Tooltip = 'Click me',
 })
 
--- Chaining a sub-button underneath
 MyButton:AddButton({
     Text = 'Sub Button',
     Func = function()
-        print('Sub button clicked!')
+        print('sub clicked!')
     end,
+    DoubleClick = true,
 })
 ```
 
 ---
 
-## Slider
+### Slider
+
+Adds a draggable slider. `Text`, `Default`, `Min`, `Max` and `Rounding` are all required. `Rounding` is the number of decimal places — use `0` for whole numbers. `Suffix` is a string appended to the displayed value such as `%` or ` studs/s`. Setting `Compact` to true hides the title label and shows the value inline instead. `HideMax` only shows the current value without the max. Access the value with `Options.MySlider.Value`.
+
 ```lua
-local MySlider = LeftGroupBox:AddSlider('MySlider', {
-    Text = 'This is my slider!',
-    Default = 0,
+LeftGroupBox:AddSlider('MySlider', {
+    Text = 'Speed',
+    Default = 16,
     Min = 0,
-    Max = 5,
-    Rounding = 1,      -- decimal places (0 = integer)
-    Compact = false,   -- hides the text label above, shows value inline
-    HideMax = false,   -- hides the max value in the display
-    Suffix = '',       -- string appended to the displayed value e.g. '%'
-    Tooltip = 'A tooltip',
-    BlankSize = 6,     -- spacing after element
-
-    Callback = function(Value)
-        print('[cb] MySlider changed:', Value)
-    end
+    Max = 100,
+    Rounding = 0,
+    Suffix = ' studs/s',
+    Compact = false,
+    HideMax = false,
 })
 
--- Methods
-MySlider:SetValue(3)
-MySlider:SetMin(1)
-MySlider:SetMax(10)
-MySlider:OnChanged(function(Value)
-    print('Slider changed:', Value)
+Options.MySlider:OnChanged(function()
+    print(Options.MySlider.Value)
 end)
 
--- Reading value
-print(Options.MySlider.Value)
+Options.MySlider:SetValue(50)
+Options.MySlider:SetMin(10)
+Options.MySlider:SetMax(200)
 ```
 
 ---
 
-## Dropdown
-```lua
-local MyDropdown = LeftGroupBox:AddDropdown('MyDropdown', {
-    Values = { 'This', 'is', 'a', 'dropdown' },
-    Default = 1,           -- index or string value
-    Multi = false,         -- allow multiple selections
-    Text = 'A dropdown',
-    Tooltip = 'A tooltip',
-    AllowNull = false,     -- allow no selection
-    BlankSize = 5,
+### Dropdown
 
-    Callback = function(Value)
-        print('[cb] Dropdown changed:', Value)
-    end
+Adds a dropdown menu. `Values` is the list of options. `Default` is either a number index or a string matching one of the values. Setting `Multi` to true allows multiple selections — in that case `Value` will be a table of `{ option = true }` pairs. `AllowNull` allows the dropdown to have no selection. Access the value with `Options.MyDropdown.Value`.
+
+```lua
+LeftGroupBox:AddDropdown('MyDropdown', {
+    Text = 'Mode',
+    Values = { 'Option A', 'Option B', 'Option C' },
+    Default = 1,
+    Multi = false,
+    AllowNull = false,
+    Tooltip = 'Pick a mode',
 })
 
--- Methods
-MyDropdown:SetValue('This')
-MyDropdown:SetValues({ 'New', 'Values' })
-MyDropdown:OnChanged(function(Value)
-    print('Dropdown changed:', Value)
+Options.MyDropdown:OnChanged(function()
+    print(Options.MyDropdown.Value)
 end)
 
--- Reading value
-print(Options.MyDropdown.Value)
+Options.MyDropdown:SetValue('Option A')
+Options.MyDropdown:SetValues({ 'New', 'List' })
+```
+
+Using `SpecialType = 'Player'` creates a dropdown that automatically lists all players in the server and updates as players join or leave.
+
+```lua
+LeftGroupBox:AddDropdown('PlayerDropdown', {
+    SpecialType = 'Player',
+    Text = 'Select Player',
+})
 ```
 
 ---
 
-## Color Picker
-Color pickers are chained onto a label.
-```lua
-LeftGroupBox:AddLabel('Color'):AddColorPicker('ColorPicker', {
-    Default = Color3.new(1, 1, 1),
-    Title = 'Some color',   -- optional title shown in the picker popup
-    Transparency = 0,       -- enables transparency slider (nil to disable)
+### Color Picker
 
-    Callback = function(Value)
-        print('[cb] Color changed!', Value)
-    end
+Color pickers are chained onto a label with `:AddColorPicker`. `Default` is the starting `Color3` value. `Title` is shown at the top of the picker popup. Setting `Transparency` to a number enables a transparency slider below the color picker — leave it as `nil` to disable. Access the color with `Options.ColorPicker.Value` and the transparency with `Options.ColorPicker.Transparency`.
+
+```lua
+LeftGroupBox:AddLabel('Chams Color'):AddColorPicker('ColorPicker', {
+    Default = Color3.fromRGB(255, 100, 100),
+    Title = 'Chams Color',
+    Transparency = 0,
 })
 
--- Methods
-Options.ColorPicker:SetValueRGB(Color3.fromRGB(255, 0, 128))
-Options.ColorPicker:OnChanged(function(Value)
-    print('Color changed:', Value)
+Options.ColorPicker:OnChanged(function()
+    print(Options.ColorPicker.Value)
+    print(Options.ColorPicker.Transparency)
 end)
 
--- Reading value
-print(Options.ColorPicker.Value)         -- Color3
-print(Options.ColorPicker.Transparency) -- number
+Options.ColorPicker:SetValueRGB(Color3.fromRGB(0, 255, 140))
 ```
 
 ---
 
-## Keybind
-Keybinds are chained onto a label.
-```lua
-LeftGroupBox:AddLabel('Keybind'):AddKeyPicker('KeyPicker', {
-    Default = 'MB2',          -- key name or 'MB1' / 'MB2' for mouse buttons
-    Text = 'Example Keybind', -- label shown in the keybind menu
-    NoUI = false,             -- set true to hide from the keybind menu
-    SyncToggleState = false,  -- syncs with a parent Toggle's state
-    Mode = 'Toggle',          -- 'Always', 'Toggle', or 'Hold'
-    Modes = { 'Always', 'Toggle', 'Hold' }, -- which modes to show in the picker
+### Keybind
 
-    -- fires when the assigned key is changed
+Keybinds are chained onto a label with `:AddKeyPicker`. `Default` is the starting key — use `'MB1'` or `'MB2'` for mouse buttons, or a key name like `'E'`. `Mode` controls the behaviour: `Always` fires every frame the key is held, `Toggle` switches on and off each press, `Hold` only fires while the key is actively held down. `Modes` restricts which modes appear in the picker. Setting `NoUI` to true hides it from the keybind overlay. `SyncToggleState` links the keybind state to a parent toggle so they stay in sync. `ChangedCallback` fires when the user rebinds the key. Use `GetState()` to check if the keybind is currently active and `OnClick` to run something each time it is triggered.
+
+```lua
+LeftGroupBox:AddLabel('Activate Key'):AddKeyPicker('MyKeybind', {
+    Default = 'MB2',
+    Text = 'Activate',
+    Mode = 'Toggle',
+    Modes = { 'Toggle', 'Hold' },
+    NoUI = false,
+    SyncToggleState = false,
     ChangedCallback = function(New)
-        print('[cb] Keybind changed!', New)
+        print('Rebound to:', New)
     end,
-
-    Callback = function(Value)
-        print('[cb] Keybind fired:', Value)
-    end
 })
 
--- Methods
-Options.KeyPicker:SetValue({ 'LeftShift', 'Toggle' })
-Options.KeyPicker:OnChanged(function(Value)
-    print('Keybind changed:', Value)
+Options.MyKeybind:OnClick(function()
+    print('State:', Options.MyKeybind:GetState())
 end)
 
--- Check if currently active
-print(Options.KeyPicker:GetKeybindActive()) -- boolean
+Options.MyKeybind:OnChanged(function()
+    print(Options.MyKeybind.Value)
+end)
+
+Options.MyKeybind:SetValue({ 'E', 'Toggle' })
 ```
 
 ---
 
-## Input (Text Box)
-```lua
-local MyInput = LeftGroupBox:AddInput('MyInput', {
-    Text = 'Label above the box',
-    Default = '',              -- default text value
-    Placeholder = 'Type here', -- placeholder text
-    Numeric = false,           -- only allow numbers
-    Finished = false,          -- only fire callback on Enter, not every keystroke
-    MaxLength = 100,           -- max character length (optional)
-    ClearTextOnFocus = true,   -- clears box when focused
-    Tooltip = 'A tooltip',
+### Input
 
-    Callback = function(Value)
-        print('[cb] Input changed:', Value)
-    end
+Adds a text input box. `Text` is the label shown above it. `Placeholder` is the greyed-out hint when the box is empty. Setting `Numeric` to true only allows numbers. Setting `Finished` to true only fires the callback when the user presses Enter rather than on every keystroke. `MaxLength` caps how many characters can be entered. `ClearTextOnFocus` clears the box when clicked. Access the value with `Options.MyInput.Value`.
+
+```lua
+LeftGroupBox:AddInput('MyInput', {
+    Text = 'Player Name',
+    Placeholder = 'Enter a name...',
+    Default = '',
+    Numeric = false,
+    Finished = true,
+    MaxLength = 50,
+    ClearTextOnFocus = true,
+    Tooltip = 'Type a player name',
 })
 
--- Methods
-MyInput:SetValue('hello')
-MyInput:OnChanged(function(Value)
-    print('Input changed:', Value)
+Options.MyInput:OnChanged(function()
+    print(Options.MyInput.Value)
 end)
 
--- Reading value
-print(Options.MyInput.Value)
+Options.MyInput:SetValue('Roblox')
 ```
 
 ---
 
-## Label
+### Label
+
+Adds a static text label. Pass `true` as the second argument to allow the text to wrap onto multiple lines.
+
 ```lua
-local MyLabel = LeftGroupBox:AddLabel('This is a label', false)
--- second arg: doesWrap (boolean, optional) — wraps long text
+local MyLabel = LeftGroupBox:AddLabel('Hello world')
+local WrappedLabel = LeftGroupBox:AddLabel('This is long text\nthat wraps.', true)
 
--- Methods
-MyLabel:SetText('Updated label')
+MyLabel:SetText('Updated text')
 ```
 
 ---
 
-## Divider
+### Divider
+
+Adds a horizontal line to visually separate elements inside a groupbox.
+
 ```lua
 LeftGroupBox:AddDivider()
 ```
 
 ---
 
-## Blank (Spacer)
+### Blank
+
+Adds empty vertical spacing. The number is the height in pixels.
+
 ```lua
-LeftGroupBox:AddBlank(10)  -- adds N pixels of vertical spacing
+LeftGroupBox:AddBlank(10)
 ```
 
 ---
 
-## Dependency Box
-A dependency box is a container whose visibility is tied to the value of other elements. When the dependencies are not met it collapses completely.
+### Dependency Box
+
+A dependency box is a container that shows or hides itself based on the state of other elements. When conditions are not met it collapses entirely, hiding everything inside it. Dependency boxes can be nested — a child box inherits the visibility rules of its parent on top of its own. Add elements to it the same way as a groupbox, then call `SetupDependencies` with a list of `{ element, expectedValue }` pairs.
+
 ```lua
 local DepBox = LeftGroupBox:AddDependencyBox()
 
--- Add elements to it like any groupbox
-DepBox:AddToggle('InnerToggle', { Text = 'Only visible when deps met' })
+DepBox:AddSlider('DepSlider', {
+    Text = 'Extra Setting',
+    Default = 5,
+    Min = 0,
+    Max = 10,
+    Rounding = 0,
+})
 
--- Set which elements + values must match for it to be visible
 DepBox:SetupDependencies({
-    { Toggles.MyToggle, true },           -- MyToggle must be true
-    { Options.MyDropdown, 'SomeValue' },  -- MyDropdown must equal 'SomeValue'
+    { Toggles.MyToggle, true },
+    { Options.MyDropdown, 'Option A' },
 })
 ```
 
 ---
 
-## Notification
+## Library Methods
+
+### Notify
+
+Shows a notification. The second argument is how many seconds it stays on screen, defaulting to 5. The third argument is an optional Roblox asset sound ID to play when it appears.
+
 ```lua
-Library:Notify('This is a notification')
-Library:Notify('Custom duration', 3)         -- 3 seconds
-Library:Notify('With sound', 5, 131961136)   -- text, time, SoundId
+Library:Notify('Something happened')
+Library:Notify('Watch out!', 3)
+Library:Notify('Done', 5, 131961136)
 ```
 
 ---
 
-## Toggle the UI
+### Toggle UI
+
+Shows or hides the window. Assign a keybind via `Library.ToggleKeybind` to let users toggle it with a key.
+
 ```lua
-Library:Toggle()  -- shows/hides the window
+Library:Toggle()
 ```
 
 ---
 
-## Unload the library
-```lua
-Library:Unload()
--- Disconnects all signals, calls Library.OnUnload if set, destroys the ScreenGui
+### Unload
 
+Destroys the UI and disconnects all signals. `OnUnload` lets you run cleanup code beforehand. Set `Library.Unloaded = true` inside the callback if you need running loops to stop.
+
+```lua
 Library:OnUnload(function()
-    print('Library unloaded!')
+    print('Unloaded!')
+    Library.Unloaded = true
 end)
+
+Library:Unload()
 ```
 
 ---
 
 ## ThemeManager
+
+Gives users a built-in theme picker. Call `SetLibrary` and `SetFolder` before using it. Use `ApplyToTab` to attach the theme UI to a full tab, or `ApplyToGroupbox` to attach it to a groupbox you created yourself.
+
 ```lua
 ThemeManager:SetLibrary(Library)
 ThemeManager:SetFolder('MyHub')
 
--- Attach to a tab
-ThemeManager:ApplyToTab(Tab)
+ThemeManager:ApplyToTab(Tabs['UI Settings'])
 
--- Or attach to an existing groupbox
-ThemeManager:ApplyToGroupbox(LeftGroupBox)
+local ThemeBox = Tabs['UI Settings']:AddLeftGroupbox('Themes')
+ThemeManager:ApplyToGroupbox(ThemeBox)
 ```
 
 ---
 
 ## SaveManager
+
+Gives users a config save and load system. Call `SetLibrary` and `SetFolder` first. `IgnoreThemeSettings` prevents theme state from being saved into configs. `SetIgnoreIndexes` excludes specific elements from being saved — commonly used for the menu keybind so each config doesn't override it. Pass your UI Settings tab into `BuildConfigSection` to build the config UI. Call `LoadAutoloadConfig` at the end to load the user's autoload config on startup.
+
 ```lua
 SaveManager:SetLibrary(Library)
 SaveManager:SetFolder('MyHub')
 
--- Attach to a groupbox (not a tab)
-local SaveGroupBox = Tab:AddLeftGroupbox('Configs')
-SaveManager:BuildConfigSection(SaveGroupBox)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
 
--- Load default config on startup
+SaveManager:BuildConfigSection(Tabs['UI Settings'])
 SaveManager:LoadAutoloadConfig()
 ```
 
 ---
 
-## Full Example Script
+## Example Script
+
 ```lua
 local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/G/refs/heads/main/Gui_Lib_fixed.txt'))()
 local ThemeManager = loadstring(game:HttpGet('https://raw.githubusercontent.com/Goatofhells/Linoria-Library-Mobile/refs/heads/main/Gui%20Lib%20%5BThemeManager%5D'))()
@@ -381,22 +406,21 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     Main = Window:AddTab('Main'),
-    Settings = Window:AddTab('Settings'),
+    ['UI Settings'] = Window:AddTab('UI Settings'),
 }
 
-local LeftGroupBox  = Tabs.Main:AddLeftGroupbox('Main')
+local LeftGroupBox  = Tabs.Main:AddLeftGroupbox('Features')
 local RightGroupBox = Tabs.Main:AddRightGroupbox('Misc')
 
--- Toggle
 LeftGroupBox:AddToggle('MyToggle', {
     Text = 'Enable Feature',
     Default = false,
-    Callback = function(Value)
-        print('Toggle:', Value)
-    end
+    Tooltip = 'Turns the feature on or off',
 })
+Toggles.MyToggle:OnChanged(function()
+    print('Toggle:', Toggles.MyToggle.Value)
+end)
 
--- Slider
 LeftGroupBox:AddSlider('MySlider', {
     Text = 'Speed',
     Default = 16,
@@ -404,22 +428,20 @@ LeftGroupBox:AddSlider('MySlider', {
     Max = 100,
     Rounding = 0,
     Suffix = ' studs/s',
-    Callback = function(Value)
-        print('Slider:', Value)
-    end
 })
+Options.MySlider:OnChanged(function()
+    print('Slider:', Options.MySlider.Value)
+end)
 
--- Dropdown
 LeftGroupBox:AddDropdown('MyDropdown', {
     Text = 'Mode',
-    Values = { 'Silent Aim', 'Aimbot', 'Off' },
-    Default = 3,
-    Callback = function(Value)
-        print('Dropdown:', Value)
-    end
+    Values = { 'Option A', 'Option B', 'Option C' },
+    Default = 1,
 })
+Options.MyDropdown:OnChanged(function()
+    print('Dropdown:', Options.MyDropdown.Value)
+end)
 
--- Button
 LeftGroupBox:AddButton({
     Text = 'Do Something',
     Func = function()
@@ -428,35 +450,8 @@ LeftGroupBox:AddButton({
     DoubleClick = false,
 })
 
--- Color Picker
-RightGroupBox:AddLabel('Chams Color'):AddColorPicker('ChamColor', {
-    Default = Color3.fromRGB(255, 100, 100),
-    Callback = function(Value)
-        print('Color:', Value)
-    end
-})
+LeftGroupBox:AddDivider()
 
--- Keybind
-RightGroupBox:AddLabel('Toggle Key'):AddKeyPicker('MyKeybind', {
-    Default = 'MB2',
-    Text = 'Activate',
-    Mode = 'Hold',
-    Callback = function(Value)
-        print('Keybind fired:', Value)
-    end
-})
-
--- Input
-RightGroupBox:AddInput('MyInput', {
-    Text = 'Player Name',
-    Placeholder = 'Enter name...',
-    Finished = true,
-    Callback = function(Value)
-        print('Input:', Value)
-    end
-})
-
--- Dependency Box (only visible when MyToggle is on)
 local DepBox = LeftGroupBox:AddDependencyBox()
 DepBox:AddSlider('DepSlider', {
     Text = 'Extra Setting',
@@ -469,16 +464,48 @@ DepBox:SetupDependencies({
     { Toggles.MyToggle, true },
 })
 
--- Settings tab
-local ThemeGroupBox = Tabs.Settings:AddLeftGroupbox('Themes')
-local SaveGroupBox  = Tabs.Settings:AddRightGroupbox('Configs')
+RightGroupBox:AddLabel('Chams Color'):AddColorPicker('MyColor', {
+    Default = Color3.fromRGB(255, 100, 100),
+    Transparency = 0,
+})
+Options.MyColor:OnChanged(function()
+    print('Color:', Options.MyColor.Value)
+end)
+
+RightGroupBox:AddLabel('Activate Key'):AddKeyPicker('MyKeybind', {
+    Default = 'MB2',
+    Text = 'Activate',
+    Mode = 'Toggle',
+})
+Options.MyKeybind:OnChanged(function()
+    print('Keybind:', Options.MyKeybind.Value)
+end)
+
+RightGroupBox:AddInput('MyInput', {
+    Text = 'Player Name',
+    Placeholder = 'Enter name...',
+    Finished = true,
+})
+Options.MyInput:OnChanged(function()
+    print('Input:', Options.MyInput.Value)
+end)
+
+local MenuGroup = Tabs['UI Settings']:AddLeftGroupbox('Menu')
+MenuGroup:AddButton('Unload', function() Library:Unload() end)
+MenuGroup:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', {
+    Default = 'End',
+    NoUI = true,
+    Text = 'Menu keybind',
+})
+Library.ToggleKeybind = Options.MenuKeybind
 
 ThemeManager:SetLibrary(Library)
-ThemeManager:SetFolder('MyHub')
-ThemeManager:ApplyToGroupbox(ThemeGroupBox)
-
 SaveManager:SetLibrary(Library)
+ThemeManager:SetFolder('MyHub')
 SaveManager:SetFolder('MyHub')
-SaveManager:BuildConfigSection(SaveGroupBox)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({ 'MenuKeybind' })
+ThemeManager:ApplyToTab(Tabs['UI Settings'])
+SaveManager:BuildConfigSection(Tabs['UI Settings'])
 SaveManager:LoadAutoloadConfig()
 ```

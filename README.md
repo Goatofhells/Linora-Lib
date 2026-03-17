@@ -354,8 +354,9 @@ ThemeManager:ApplyToGroupbox(LeftGroupBox)
 SaveManager:SetLibrary(Library)
 SaveManager:SetFolder('MyHub')
 
--- Attach to a tab
-SaveManager:BuildConfigSection(Tab)
+-- Attach to a groupbox (not a tab)
+local SaveGroupBox = Tab:AddLeftGroupbox('Configs')
+SaveManager:BuildConfigSection(SaveGroupBox)
 
 -- Load default config on startup
 SaveManager:LoadAutoloadConfig()
